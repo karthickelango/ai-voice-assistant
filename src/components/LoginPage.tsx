@@ -163,11 +163,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
             <div className="flex items-center gap-2 mb-1.5">
               <h1 className="text-xl font-bold tracking-[0.25em] uppercase text-white font-mono">
-                Karthick AI
+                Voice Assistant
               </h1>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono tracking-wider uppercase bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.3)]">
+              {/* <span className="px-2 py-0.5 rounded text-[10px] font-mono tracking-wider uppercase bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.3)]">
                 Thruv v2.2
-              </span>
+              </span> */}
             </div>
 
             <p className="text-xs text-white/50 font-mono tracking-wide max-w-xs">
@@ -321,13 +321,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-between transition-all">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`p-2.5 rounded-xl border transition-colors ${
-                        micStatus === 'granted'
+                      className={`p-2.5 rounded-xl border transition-colors ${micStatus === 'granted'
                           ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
                           : micStatus === 'requesting'
-                          ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 animate-pulse'
-                          : 'bg-white/[0.05] border-white/10 text-white/50'
-                      }`}
+                            ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 animate-pulse'
+                            : 'bg-white/[0.05] border-white/10 text-white/50'
+                        }`}
                     >
                       <Mic className="w-5 h-5" />
                     </div>
@@ -367,13 +366,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-between transition-all">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`p-2.5 rounded-xl border transition-colors ${
-                        locStatus === 'granted'
+                      className={`p-2.5 rounded-xl border transition-colors ${locStatus === 'granted'
                           ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
                           : locStatus === 'requesting'
-                          ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 animate-pulse'
-                          : 'bg-white/[0.05] border-white/10 text-white/50'
-                      }`}
+                            ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 animate-pulse'
+                            : 'bg-white/[0.05] border-white/10 text-white/50'
+                        }`}
                     >
                       <MapPin className="w-5 h-5" />
                     </div>
@@ -415,7 +413,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                     id="btn-continue-to-assistant"
                     type="button"
                     onClick={() => completeLogin(activeUser)}
-                    className="w-full py-3 px-4 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-200 text-xs font-mono uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(6,182,212,0.2)]"
+                    disabled={!username || !password}
+                    className={`w-full py-3 px-4 rounded-xl border text-xs font-mono uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.2)] ${!username || !password
+                        ? 'bg-gray-500/10 border-gray-500/20 text-gray-500 cursor-not-allowed'
+                        : 'bg-cyan-500/20 hover:bg-cyan-500/30 border-cyan-500/40 text-cyan-200 cursor-pointer'
+                      }`}
                   >
                     <span>Enter Voice Assistant</span>
                     <ArrowRight className="w-4 h-4" />
