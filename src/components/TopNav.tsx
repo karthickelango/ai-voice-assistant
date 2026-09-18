@@ -51,15 +51,15 @@ export const TopNav: React.FC<TopNavProps> = ({
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
             <h1 className="text-sm font-semibold tracking-[0.2em] uppercase text-white">
-              Karthick AI
+              Voice Assistant
             </h1>
             <span className="px-1.5 py-0.5 rounded text-[9px] font-mono tracking-wider uppercase bg-cyan-950/60 border border-cyan-500/30 text-cyan-300">
-              Voice Assistant • Thruv
+              Thruv
             </span>
           </div>
-          <span className="text-[10px] font-mono text-white/30 tracking-wider">
+          {/* <span className="text-[10px] font-mono text-white/30 tracking-wider">
             {username ? `User: ${username}` : 'Voice-Only Smart Assistant'}
-          </span>
+          </span> */}
         </div>
       </div>
 
@@ -120,7 +120,7 @@ export const TopNav: React.FC<TopNavProps> = ({
         </button>
 
         {/* Settings Button */}
-        <button
+        {/* <button
           id="nav-btn-settings"
           onClick={onOpenSettings}
           title="Assistant Settings"
@@ -128,7 +128,7 @@ export const TopNav: React.FC<TopNavProps> = ({
           aria-label="Open settings panel"
         >
           <Settings className="w-4 h-4" />
-        </button>
+        </button> */}
 
         {/* Lock Terminal / Logout Button */}
         {onLogout && (

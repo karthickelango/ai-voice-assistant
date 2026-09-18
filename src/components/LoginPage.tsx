@@ -179,12 +179,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             </div>
 
             <div className="flex items-center gap-2 mb-1.5">
-              <h1 className="text-xl font-bold tracking-[0.25em] uppercase text-white font-mono">
-                Karthick AI
+              <h1 className="text-xl font-bold tracking-[0.25em] text-white font-mono">
+                Thruv
               </h1>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono tracking-wider uppercase bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.3)]">
+              {/* <span className="px-2 py-0.5 rounded text-[10px] font-mono tracking-wider uppercase bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.3)]">
                 Thruv v2.2
-              </span>
+              </span> */}
             </div>
 
             <p className="text-xs text-white/50 font-mono tracking-wide max-w-xs">
@@ -308,7 +308,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 </button>
 
                 {/* Autofill Helper */}
-                <div className="pt-2 flex flex-col items-center">
+                {/* <div className="pt-2 flex flex-col items-center">
                   <button
                     type="button"
                     id="btn-autofill-credentials"
@@ -318,7 +318,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                     <Sparkles className="w-3 h-3 text-cyan-300" />
                     <span>Auto-fill Demo Credentials (Assistant_AI)</span>
                   </button>
-                </div>
+                </div> */}
               </motion.form>
             ) : (
               /* Step 2: System Permissions Authorization Screen */
