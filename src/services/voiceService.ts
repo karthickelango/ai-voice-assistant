@@ -37,6 +37,7 @@ declare global {
 class VoiceService {
   private recognition: SpeechRecognitionInstance | null = null;
   private wakeWordRecognition: SpeechRecognitionInstance | null = null;
+  private wakeWordBuffer = '';
   private isRecognizing = false;
   private isWakeWordActive = false;
   private wakeWordRestartTimeout: number | null = null;
