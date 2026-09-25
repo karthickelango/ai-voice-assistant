@@ -10,7 +10,7 @@ interface RoadmapModalProps {
 const ROADMAP_STEPS = [
   { version: 'v1.0', name: 'Cinematic Voice & Core Experience', active: true, desc: 'Interactive AI core orb, speech recognition, Google Gemini, text-to-speech, and responsive cinematic UI.' },
   { version: 'v2.0', name: 'Wake Word Architecture', active: true, desc: 'Continuous hands-free wake word detection with automatic "Yes?" acknowledgment and command transition.' },
-  { version: 'v2.1', name: 'Voice-Only & Live Weather Tool ("Hey Thruv")', active: true, desc: 'Voice-first interface, dynamic English female voice synthesis, "Hey Thruv" wake phrase, and real Open-Meteo live weather tool.' },
+  { version: 'v2.1', name: 'Voice-Only & Live Weather Tool ("Hey Jarvis")', active: true, desc: 'Voice-first interface, dynamic English female voice synthesis, "Hey Jarvis" wake phrase, and real Open-Meteo live weather tool.' },
   { version: 'v3.0', name: 'Gemini Function Calling', active: false, desc: 'Real-time tool invocation engine connecting Gemini to real APIs.' },
   { version: 'v4.0', name: 'Personal Tools Suite', active: false, desc: 'Live weather, web search, local reminders, and personal expense logging.' },
   { version: 'v5.0', name: 'Persistent Memory & Preferences', active: false, desc: 'Long-term MongoDB user profile, custom preferences, and episodic dialogue recall.' },

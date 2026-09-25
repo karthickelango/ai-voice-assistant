@@ -127,7 +127,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </span>
                 </div>
                 <span className="text-xs text-white/60 mt-1">
-                  Say <strong className="text-cyan-300 font-mono font-medium">"Hey Thruv"</strong> for continuous hands-free activation. Assistant answers "Yes?" and listens for your command.
+                  Say <strong className="text-cyan-300 font-mono font-medium">"Hey Jarvis"</strong> for continuous hands-free activation. Assistant answers "Yes?" and listens for your command.
                 </span>
               </div>
               <label className="relative inline-flex items-center cursor-pointer shrink-0">

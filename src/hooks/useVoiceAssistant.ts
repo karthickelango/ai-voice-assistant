@@ -21,7 +21,7 @@ export interface UseVoiceAssistantOptions {
 export function useVoiceAssistant(options: UseVoiceAssistantOptions = { enabled: true }) {
   const isEnabled = options.enabled !== false;
   const [state, setState] = useState<AssistantState>('IDLE');
-  const [statusMessage, setStatusMessage] = useState<string>('Say "Hey Thruv"');
+  const [statusMessage, setStatusMessage] = useState<string>('Say "Hey Jarvis"');
   const [interimTranscript, setInterimTranscript] = useState<string>('');
   const [audioLevel, setAudioLevel] = useState<number>(0);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -104,11 +104,11 @@ export function useVoiceAssistant(options: UseVoiceAssistantOptions = { enabled:
   useEffect(() => {
     switch (state) {
       case 'IDLE':
-        setStatusMessage('Say "Hey Thruv"');
+        setStatusMessage('Say "Hey Jarvis"');
         setInterimTranscript('');
         break;
       case 'LISTENING_FOR_WAKE_WORD':
-        setStatusMessage('Say "Hey Thruv"');
+        setStatusMessage('Say "Hey Jarvis"');
         setInterimTranscript('');
         break;
       case 'WAKE_WORD_DETECTED':
@@ -423,7 +423,7 @@ export function useVoiceAssistant(options: UseVoiceAssistantOptions = { enabled:
     startCommandListeningRef.current = startCommandListening;
   }, [startCommandListening]);
 
-  // Handle Wake Word detection ("Hey Thruv" detected)
+  // Handle Wake Word detection ("Hey Jarvis" detected)
   const handleWakeWordDetected = useCallback((matchedPhrase: string, trailingCommand?: string) => {
     // Duck music volume so mic and voice recognition are not disrupted by song audio
     musicPlayerService.duck();
@@ -436,7 +436,7 @@ export function useVoiceAssistant(options: UseVoiceAssistantOptions = { enabled:
       voiceService.playChime('activate');
     }
 
-    // 3. If user said command in one breath with the wake word (e.g. "Hey Thruv, what's the weather?")
+    // 3. If user said command in one breath with the wake word (e.g. "Hey Jarvis, what's the weather?")
     const cleanCommand = trailingCommand?.trim();
     if (cleanCommand && cleanCommand.length > 2) {
       setStatusMessage(`Heard: "${cleanCommand}"`);
@@ -491,7 +491,7 @@ export function useVoiceAssistant(options: UseVoiceAssistantOptions = { enabled:
 
     voiceService.startWakeWordListening({
       onStart: () => {
-        setStatusMessage('Say "Hey Thruv"');
+        setStatusMessage('Say "Hey Jarvis"');
       },
       onWakeWordDetected: (matchedPhrase, trailingCommand) => {
         handleWakeWordDetected(matchedPhrase, trailingCommand);

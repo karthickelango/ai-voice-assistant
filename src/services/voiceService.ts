@@ -59,17 +59,22 @@ class VoiceService {
   }
 
   // Wake Word Pattern Matcher & Command Extractor
-  // Matches "Hey Thruv", "Hey Dhruv", "Hey Drew", "Hey True", "Hey Truth", "Hey Through",
-  // "Hi Thruv", "Hello Thruv", "Ok Thruv", "Thruv", "Hey Karthick", "Hey Karthik", etc.
-  public checkWakeWord(text: string): { matched: boolean; phrase: string; command?: string } {
+  // Supports "Hey Jarvis", "Jarvis", and common recognition variations.
+  public checkWakeWord(
+    text: string
+  ): {
+    matched: boolean;
+    phrase: string;
+    command?: string;
+  } {
     if (!text || typeof text !== 'string') {
       return { matched: false, phrase: '' };
     }
 
-    // Strip punctuation, normalize whitespace to single spaces, lowercase
+    // Strip punctuation, normalize whitespace, lowercase.
     const clean = text
       .toLowerCase()
-      .replace(/[.,/#!$%^&*;:{}=\-_`~()?]/g, ' ')
+      .replace(/[.,/#!$%^&\*;:{}=\\\-_`\~()?]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
 
@@ -77,40 +82,84 @@ class VoiceService {
       return { matched: false, phrase: '' };
     }
 
-    // 1. With common wake word prefixes:
-    // (hey|hi|hello|ok|okay|listen|yo|wake\s*up)
-    // followed by phonetic variations of Thruv/Dhruv/Karthick
-    const prefixPattern = /\b(hey|hi|hello|ok|okay|listen|yo|wake\s*up)\s+(thruv|dhruv|dhruva|dhurv|druv|dhrub|thru|tru|truv|trov|troov|trough|trove|troff|drew|dru|droo|true|truth|through|threw|throuv|throu|drive|drove|thrive|troop|groove|group|proof|roof|theruv|tharuv|thuruv|thuru|tarun|thruf|karthick|karthik|kartik|karthic|carthik)\b/i;
+    /*
+     * 1. Wake word with a prefix.
+     *
+     * Examples:
+     *   "hey jarvis"
+     *   "hi jarvis"
+     *   "hello jarvis"
+     *   "ok jarvis"
+     *   "okay jarvis"
+     *   "listen jarvis"
+     *   "yo jarvis"
+     *
+     * We also allow common SpeechRecognition variations:
+     *   jarvis
+     *   jervis
+     *   jarviss
+     *   jarvice
+     */
+    const prefixPattern =
+      /\b(hey|hi|hello|ok|okay|listen|yo)\s+(jarvis|jervis|jarviss|jarvice)\b/i;
 
     const prefixMatch = prefixPattern.exec(clean);
+
     if (prefixMatch) {
       const matchedPhrase = prefixMatch[0];
-      const matchEnd = prefixMatch.index + matchedPhrase.length;
-      const trailingCommand = clean.slice(matchEnd).trim();
+
+      const matchEnd =
+        prefixMatch.index + matchedPhrase.length;
+
+      const trailingCommand =
+        clean.slice(matchEnd).trim();
+
       return {
         matched: true,
         phrase: matchedPhrase,
-        command: trailingCommand.length > 1 ? trailingCommand : undefined,
+        command:
+          trailingCommand.length > 1
+            ? trailingCommand
+            : undefined,
       };
     }
 
-    // 2. Direct name call without prefix:
-    // "Thruv", "Dhruv", "Dhruva", "Thru", "Karthick", "Karthik"
-    // e.g. "Thruv what is the weather" or just "Thruv"
-    const directPattern = /\b(thruv|dhruv|dhruva|karthick|karthik)\b/i;
-    const directMatch = directPattern.exec(clean);
+    /*
+     * 2. Direct name call.
+     *
+     * Examples:
+     *   "jarvis"
+     *   "jarvis what is the weather"
+     */
+    const directPattern =
+      /\b(jarvis|jervis|jarviss|jarvice)\b/i;
+
+    const directMatch =
+      directPattern.exec(clean);
+
     if (directMatch) {
       const matchedPhrase = directMatch[0];
-      const matchEnd = directMatch.index + matchedPhrase.length;
-      const trailingCommand = clean.slice(matchEnd).trim();
+
+      const matchEnd =
+        directMatch.index + matchedPhrase.length;
+
+      const trailingCommand =
+        clean.slice(matchEnd).trim();
+
       return {
         matched: true,
         phrase: matchedPhrase,
-        command: trailingCommand.length > 1 ? trailingCommand : undefined,
+        command:
+          trailingCommand.length > 1
+            ? trailingCommand
+            : undefined,
       };
     }
 
-    return { matched: false, phrase: '' };
+    return {
+      matched: false,
+      phrase: '',
+    };
   }
 
   public isWakeWordMatch(text: string): boolean {
@@ -161,7 +210,7 @@ class VoiceService {
       }
 
       setTimeout(() => {
-        ctx.close().catch(() => {});
+        ctx.close().catch(() => { });
       }, 500);
     } catch {
       // Audio context might be restricted before user gesture; fail silently
@@ -174,7 +223,16 @@ class VoiceService {
       if (!navigator.mediaDevices?.getUserMedia) return;
 
       if (!this.micStream) {
-        this.micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        this.micStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            channelCount: 1,
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+            sampleRate: 48000,
+            sampleSize: 16
+          }
+        });
       }
 
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -361,14 +419,21 @@ class VoiceService {
   }
 
   private runWakeWordRecognition(): void {
-    if (!this.isWakeWordActive || this.isSpeaking() || this.isRecognizing) {
+    if (
+      !this.isWakeWordActive ||
+      this.isSpeaking() ||
+      this.isRecognizing
+    ) {
       return;
     }
 
-    // Thoroughly clean up previous recognition instance before creating fresh one
+    // Clean transcript state for a fresh recognition session.
+    this.wakeWordBuffer = '';
+
     if (this.wakeWordRecognition) {
       const oldRec = this.wakeWordRecognition;
       this.wakeWordRecognition = null;
+
       try {
         oldRec.onstart = null;
         oldRec.onresult = null;
@@ -376,84 +441,323 @@ class VoiceService {
         oldRec.onend = null;
         oldRec.abort();
       } catch {
-        // Ignore abort errors
+        // Ignore abort errors.
       }
     }
 
-    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRec) return;
+    const SpeechRec =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
+
+    if (!SpeechRec) {
+      console.warn(
+        '[VoiceService] SpeechRecognition is not supported in this browser.'
+      );
+      return;
+    }
 
     try {
       const rec = new SpeechRec();
+
       rec.continuous = true;
       rec.interimResults = true;
       rec.maxAlternatives = 3;
-      rec.lang = (typeof navigator !== 'undefined' && navigator.language) || 'en-US';
+
+      rec.lang =
+        (typeof navigator !== 'undefined' && navigator.language) ||
+        'en-US';
 
       rec.onstart = () => {
+        // console.log(
+        //   '[VoiceService] Wake word recognition started'
+        // );
+
         this.wakeWordCallbacks?.onStart?.();
       };
 
       rec.onresult = (event: SpeechRecognitionEventLike) => {
-        if (!this.isWakeWordActive || this.isSpeaking() || this.isRecognizing) return;
-
-        let detected = false;
-        let detectedPhrase = 'Hey Thruv';
-        let trailingCommand: string | undefined = undefined;
-
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const item = event.results[i];
-          if (!item) continue;
-
-          // Check all hypotheses returned by the speech recognizer
-          for (let a = 0; a < item.length; a++) {
-            const transcript = item[a]?.transcript || '';
-            const check = this.checkWakeWord(transcript);
-            if (check.matched) {
-              detected = true;
-              detectedPhrase = check.phrase || 'Hey Thruv';
-              trailingCommand = check.command;
-              break;
-            }
-          }
-          if (detected) break;
+        if (
+          !this.isWakeWordActive ||
+          this.isSpeaking() ||
+          this.isRecognizing
+        ) {
+          return;
         }
 
-        if (detected && this.isWakeWordActive) {
-          // Immediately stop wake-word recognition so audio input is freed for command listening
+        /*
+         * IMPORTANT:
+         *
+         * SpeechRecognition results contain both:
+         *
+         *   final results
+         *   interim results
+         *
+         * Interim results are revisions, NOT new speech.
+         *
+         * Therefore we must NOT append every interim result.
+         */
+
+        let finalTranscript = '';
+        let interimTranscript = '';
+
+        /*
+         * Read the results returned by the browser.
+         */
+        for (
+          let i = event.resultIndex;
+          i < event.results.length;
+          i++
+        ) {
+          const result = event.results[i];
+
+          if (!result) {
+            continue;
+          }
+
+          /*
+           * Use the first/best alternative for the transcript.
+           *
+           * We'll separately test all alternatives below.
+           */
+          const transcript =
+            result[0]?.transcript?.trim() || '';
+
+          if (!transcript) {
+            continue;
+          }
+
+          if (result.isFinal) {
+            finalTranscript += ` ${transcript}`;
+          } else {
+            interimTranscript += ` ${transcript}`;
+          }
+
+          /*
+           * Also check every alternative individually.
+           *
+           * This helps when Chrome returns:
+           *
+           * "dhruv"
+           * "dur"
+           * "duro"
+           * etc.
+           */
+          for (let a = 0; a < result.length; a++) {
+            const alternative =
+              result[a]?.transcript?.trim() || '';
+
+            if (!alternative) {
+              continue;
+            }
+
+            // console.log(
+            //   '[VoiceService] Wake candidate:',
+            //   alternative,
+            //   '| final:',
+            //   result.isFinal
+            // );
+
+            const directCheck =
+              this.checkWakeWord(alternative);
+
+            if (directCheck.matched) {
+              // console.log(
+              //   '[VoiceService] Wake word matched alternative:',
+              //   alternative
+              // );
+
+              this.wakeWordBuffer = '';
+
+              this.stopWakeWordListening();
+
+              this.wakeWordCallbacks?.onWakeWordDetected(
+                directCheck.phrase || 'Hey Jarvis',
+                directCheck.command
+              );
+
+              return;
+            }
+          }
+        }
+
+        /*
+         * Add ONLY final speech to the persistent buffer.
+         *
+         * Interim speech is temporary and will be replaced
+         * by the browser.
+         */
+        if (finalTranscript.trim()) {
+          this.wakeWordBuffer = [
+            this.wakeWordBuffer,
+            finalTranscript.trim(),
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+          /*
+           * Keep only the most recent 12 words.
+           */
+          const words =
+            this.wakeWordBuffer.split(' ');
+
+          if (words.length > 12) {
+            this.wakeWordBuffer =
+              words.slice(-12).join(' ');
+          }
+        }
+
+        /*
+         * For debugging, show what Chrome currently thinks
+         * you are saying.
+         */
+        const debugTranscript = [
+          this.wakeWordBuffer,
+          interimTranscript.trim(),
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+
+        if (debugTranscript) {
+          // console.log(
+          //   '[VoiceService] Wake transcript:',
+          //   debugTranscript
+          // );
+        }
+
+        /*
+         * Check the combined final + current interim transcript.
+         *
+         * Example:
+         *
+         * Final:   "hey"
+         * Interim: "dur"
+         *
+         * Combined:
+         *
+         * "hey dur"
+         *
+         * This allows checkWakeWord() to detect the wake word
+         * before the browser necessarily finalizes everything.
+         */
+        const combinedTranscript = [
+          this.wakeWordBuffer,
+          interimTranscript.trim(),
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+
+        if (!combinedTranscript) {
+          return;
+        }
+
+        const check =
+          this.checkWakeWord(combinedTranscript);
+
+        if (check.matched) {
+          // console.log(
+          //   '[VoiceService] Wake word detected:',
+          //   check.phrase || 'Hey Jarvis'
+          // );
+
+          if (check.command) {
+            // console.log(
+            //   '[VoiceService] Trailing command:',
+            //   check.command
+            // );
+          }
+
+          this.wakeWordBuffer = '';
+
           this.stopWakeWordListening();
-          this.wakeWordCallbacks?.onWakeWordDetected(detectedPhrase, trailingCommand);
+
+          this.wakeWordCallbacks?.onWakeWordDetected(
+            check.phrase || 'Hey Jarvis',
+            check.command
+          );
         }
       };
 
-      rec.onerror = (event: SpeechRecognitionErrorEventLike) => {
-        if (!this.isWakeWordActive) return;
+      rec.onerror = (
+        event: SpeechRecognitionErrorEventLike
+      ) => {
+        if (!this.isWakeWordActive) {
+          return;
+        }
+
+        console.warn(
+          '[VoiceService] Wake word recognition error:',
+          event.error
+        );
 
         if (event.error === 'not-allowed') {
-          // Microphone access denied or requires user gesture in iframe
-          this.wakeWordCallbacks?.onError('Microphone permission required. Tap anywhere to activate "Hey Thruv".', false);
-        } else if (event.error === 'no-speech' || event.error === 'aborted') {
-          // Expected normal background pause in Chromium; onend will automatically restart
+          this.wakeWordCallbacks?.onError(
+            'Microphone permission required. Tap anywhere to activate "Hey Jarvis".',
+            false
+          );
+        } else if (
+          event.error === 'no-speech' ||
+          event.error === 'aborted'
+        ) {
+          // Normal Chromium behavior.
+          // onend() will restart recognition.
         } else if (event.error === 'audio-capture') {
-          console.warn('[VoiceService] Audio capture notice, rescheduling wake word listener');
+          console.warn(
+            '[VoiceService] Audio capture notice, rescheduling wake word listener'
+          );
+
           this.scheduleWakeWordRestart(600);
+        } else if (event.error === 'network') {
+          console.warn(
+            '[VoiceService] Wake word network error, rescheduling'
+          );
+
+          this.scheduleWakeWordRestart(1000);
         } else {
-          console.warn('[VoiceService] Wake word notice:', event.error);
+          console.warn(
+            '[VoiceService] Wake word notice:',
+            event.error
+          );
         }
       };
 
       rec.onend = () => {
-        // Continuous recognition completed cycle in Chromium; restart cleanly if active
-        if (this.isWakeWordActive && !this.isSpeaking() && !this.isRecognizing) {
+        // console.log(
+        //   '[VoiceService] Wake word recognition ended'
+        // );
+
+        if (
+          this.isWakeWordActive &&
+          !this.isSpeaking() &&
+          !this.isRecognizing
+        ) {
           this.scheduleWakeWordRestart(200);
         }
       };
 
       this.wakeWordRecognition = rec;
+
       rec.start();
+
+      // console.log(
+      //   '[VoiceService] Wake word listener started'
+      // );
     } catch (err: unknown) {
-      console.warn('[VoiceService] Failed to start wake word instance:', err);
-      if (this.isWakeWordActive && !this.isSpeaking() && !this.isRecognizing) {
+      console.warn(
+        '[VoiceService] Failed to start wake word instance:',
+        err
+      );
+
+      if (
+        this.isWakeWordActive &&
+        !this.isSpeaking() &&
+        !this.isRecognizing
+      ) {
         this.scheduleWakeWordRestart(800);
       }
     }
@@ -461,21 +765,32 @@ class VoiceService {
 
   public stopWakeWordListening(): void {
     this.isWakeWordActive = false;
+
     if (this.wakeWordRestartTimeout) {
-      clearTimeout(this.wakeWordRestartTimeout);
+      clearTimeout(
+        this.wakeWordRestartTimeout
+      );
+
       this.wakeWordRestartTimeout = null;
     }
+
+    // Clear the wake-word transcript buffer.
+    this.wakeWordBuffer = '';
+
     if (this.wakeWordRecognition) {
       const rec = this.wakeWordRecognition;
+
       this.wakeWordRecognition = null;
+
       try {
         rec.onstart = null;
         rec.onresult = null;
         rec.onerror = null;
         rec.onend = null;
+
         rec.abort();
       } catch {
-        // Ignore abort errors
+        // Ignore abort errors.
       }
     }
   }

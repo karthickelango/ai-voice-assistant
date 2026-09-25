@@ -72,8 +72,8 @@ export const TopNav: React.FC<TopNavProps> = ({
             onClick={onToggleWakeWord}
             title={
               wakeWordEnabled
-                ? 'Wake Word Mode ACTIVE (Listening for "Hey Thruv") — Click to disable'
-                : 'Wake Word Mode OFF — Click to enable hands-free "Hey Thruv"'
+                ? 'Wake Word Mode ACTIVE (Listening for "Hey Jarvis") — Click to disable'
+                : 'Wake Word Mode OFF — Click to enable hands-free "Hey Jarvis"'
             }
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-mono transition-all cursor-pointer ${
               wakeWordEnabled

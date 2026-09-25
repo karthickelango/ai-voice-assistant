@@ -152,7 +152,7 @@ export default function App() {
           {/* Voice Assistant Minimal Guidance Footer */}
           <footer className="relative z-10 w-full pb-6 pt-2 flex flex-col items-center justify-center text-center">
             <div className="flex items-center gap-3 text-xs font-mono text-white/30 tracking-wider select-none">
-              <span>Say "Hey Thruv"</span>
+              <span>Say "Hey Jarvis"</span>
               <span className="text-white/10">•</span>
               <span>"Play Believer"</span>
               <span className="text-white/10">•</span>

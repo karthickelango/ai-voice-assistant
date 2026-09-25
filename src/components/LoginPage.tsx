@@ -352,7 +352,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                         Microphone Access
                       </div>
                       <div className="text-[11px] font-mono text-white/40">
-                        Speech commands & "Hey Thruv" detection
+                        Speech commands & "Hey Jarvis" detection
                       </div>
                     </div>
                   </div>
